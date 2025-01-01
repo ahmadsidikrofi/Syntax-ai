@@ -5,7 +5,6 @@ import RenderMessage from './RenderMessage';
 import { CaretDoubleUp, CheckCircle, ClipboardText, PencilLine, Sparkle } from '@phosphor-icons/react';
 import { useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import { isMobile } from 'react-device-detect';
 
 export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit } = useChat();

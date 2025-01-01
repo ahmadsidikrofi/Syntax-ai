@@ -54,7 +54,7 @@ export default function Chat() {
                     className="pt-5 px-5 rounded-[30px] focus:outline-none  min-h-[130px] min-w-[700px] bg-sky-100"
                   />
                 ) : (
-                  <div className="font-medium">
+                  <div className="font-medium whitespace-pre-line">
                     <RenderMessage content={m.content}/>
                   </div>
                 )}

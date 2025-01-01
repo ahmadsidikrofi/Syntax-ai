@@ -5,6 +5,7 @@ import RenderMessage from './RenderMessage';
 import { CaretDoubleUp, CheckCircle, ClipboardText, PencilLine, Sparkle } from '@phosphor-icons/react';
 import { useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import scrollbarHide from 'tailwind-scrollbar-hide'
 
 export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit } = useChat();
@@ -18,8 +19,10 @@ export default function Chat() {
     if (e.key === 'Enter' && e.shiftKey) {
       const cursorPosition = e.target.selectionStart;
       const updatedValue =
-        input.slice(0, cursorPosition) + "  \n" + input.slice(cursorPosition);
-      handleInputChange({ target: { value: updatedValue } });
+        input.slice(0, cursorPosition) + "\n" + input.slice(cursorPosition);
+      handleInputChange({ target: { value: updatedValue } })
+      setEditContent(e.target.value)
+      e.target.scrollTop = e.target.scrollHeight
       e.preventDefault();
     } else if (e.key === 'Enter') {
       e.preventDefault();
@@ -37,21 +40,21 @@ export default function Chat() {
     setIsResponseCopied(true)
   }
   return (
-    <div className="flex flex-col w-full max-w-5xl py-16 mx-auto stretch">
+    <div className="flex flex-col w-full max-w-3xl py-16 mx-auto stretch">
       {messages.map(m => {
         console.log(m.content)
         return (
-          <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} items-start`}>
+          <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} items-start max-sm:px-5 sm:px-5 lg:px-0`}>
             {m.role === 'assistant' && (
               <span className='mt-4 mx-4'><Sparkle size={40} className='rounded-full border p-2' /></span>
             )}
             <div className="flex flex-col gap-2 max-w-[80%]">
-              <div className={`mt-4 p-3 ${isEditModeOn && editResponseMode === m.id ? '' : m.role === 'user' ? 'bg-slate-100' : 'bg-sky-100'} text-slate-800 rounded-[20px] overflow-x-auto`}>
+              <div className={`mt-4 p-3 ${isEditModeOn && editResponseMode === m.id ? '' : m.role === 'user' ? 'bg-slate-100' : 'bg-sky-100'} text-slate-800 rounded-[20px] overflow-x-auto ${isEditModeOn && m.role === 'assistant' ? '' : 'shadow-component'}`}>
                 {isEditModeOn && editResponseMode === m.id ? (
                   <textarea
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
-                    className="pt-5 px-5 rounded-[30px] focus:outline-none  min-h-[130px] min-w-[700px] bg-sky-100"
+                    className={`px-5 rounded-[20px] focus:outline-none  min-h-[130px] min-w-[600px] bg-sky-100 scrollbar-hide ${isEditModeOn ? 'shadow-component py-3' : ''}`}
                   />
                 ) : (
                   <div className="font-medium whitespace-pre-line">
@@ -79,10 +82,10 @@ export default function Chat() {
       })}
 
       <div className='mt-20'>    
-        <form onSubmit={handleSubmit} className='fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-lg'>
-          <div className='flex gap-4 items-center justify-center'>
+        <form onSubmit={handleSubmit} className='fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-xl'>
+          <div className='flex gap-4 items-center justify-center max-sm:px-5'>
             <textarea
-              className="flex-1 dark:bg-black bg-slate-100 dark:text-white text-slate-800 pt-3 pb-6 px-5 mb-8 rounded-[15px] shadow-xl mx-auto focus:outline-none focus:ring-0 placeholder:text-slate-800 dark:placeholder:text-white dark:caret-white caret-black resize-none"
+              className="flex-1 dark:bg-black bg-slate-100 dark:text-white text-slate-800 pt-3 pb-6 px-5 mb-8 rounded-[15px] shadow-xl mx-auto focus:outline-none focus:ring-0 placeholder:text-slate-800 dark:placeholder:text-white dark:caret-white caret-black resize-none scrollbar-hide"
               value={input}
               placeholder="Ketik apapun"
               onChange={handleInputChange}

@@ -5,7 +5,7 @@ import RenderMessage from './RenderMessage';
 import { CaretDoubleUp, CheckCircle, ClipboardText, PencilLine, Sparkle } from '@phosphor-icons/react';
 import { useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import scrollbarHide from 'tailwind-scrollbar-hide'
+import { isMobile } from 'react-device-detect';
 
 export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit } = useChat();
@@ -16,7 +16,7 @@ export default function Chat() {
   const [ copyResponseByID, setCopyResponseById ] = useState(null)
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && e.shiftKey) {
+    if (!isMobile && e.key === 'Enter' && e.shiftKey) {
       const cursorPosition = e.target.selectionStart;
       const updatedValue =
         input.slice(0, cursorPosition) + "\n" + input.slice(cursorPosition);

@@ -4,6 +4,7 @@ import { useChat } from 'ai/react';
 import RenderMessage from './RenderMessage';
 import { CaretDoubleUp, CheckCircle, ClipboardText, PencilLine, Sparkle } from '@phosphor-icons/react';
 import { useState } from 'react';
+import UserMessageBox from './UserMessageBox';
 
 export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit } = useChat();
@@ -12,30 +13,6 @@ export default function Chat() {
   const [ isEditModeOn, setEditModeOn ] = useState(false)
   const [ isResponseCopied, setIsResponseCopied ] = useState(false)
   const [ copyResponseByID, setCopyResponseById ] = useState(null)
-
-  const handleKeyPress = (e) => {
-    const isMobileDevice = window.innerWidth <= 768
-    if (e.key === 'Enter' && e.shiftKey) {
-      const cursorPosition = e.target.selectionStart;
-      const updatedValue =
-        input.slice(0, cursorPosition) + "\n" + input.slice(cursorPosition);
-      handleInputChange({ target: { value: updatedValue } })
-      setEditContent(e.target.value)
-      e.target.scrollTop = e.target.scrollHeight
-      e.preventDefault();
-    } else if (isMobileDevice && e.key === "Enter") {
-      const cursorPosition = e.target.selectionStart;
-      const updatedValue =
-        input.slice(0, cursorPosition) + "\n" + input.slice(cursorPosition);
-      handleInputChange({ target: { value: updatedValue } })
-      setEditContent(e.target.value)
-      e.target.scrollTop = e.target.scrollHeight
-      e.preventDefault();
-    } else if (!isMobileDevice && e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit();
-    }
-  }
 
   const onEditResponseMode = (messageId, content) => {
     setEditModeOn((prevState) => !prevState)
@@ -51,14 +28,16 @@ export default function Chat() {
     navigator.clipboard.writeText(formattedText).then(() => {
       setCopyResponseById(messageId);
       setIsResponseCopied(true);
-      setTimeout(() => setIsResponseCopied(false), 1000);
-    });
-  };
+      setTimeout(() => setIsResponseCopied(false), 1000)
+    })
+  }
   const formatMarkdownForCopy = (text) => {
     return text
-      .replace(/\|\\|/g, "")
-      .replace(/\|/g, "\t") 
+      .replace(/\**\*/g, "")
+      .replace(/\|-/g, "")
+      .replace(/\|/g, "\t")
       .replace(/\n\s*\n/g, "\n")
+      .replace(/\n\s*-{3,}\s*\n/g, "\n")
   }
   
   return (
@@ -79,8 +58,9 @@ export default function Chat() {
                     className={`px-5 rounded-[20px] focus:outline-none  min-h-[130px] min-w-[600px] bg-sky-100 scrollbar-hide ${isEditModeOn ? 'shadow-component py-3' : ''}`}
                   />
                 ) : (
-                  <div className="font-medium whitespace-pre-wrap">
+                  <div>
                     <RenderMessage content={m.content}/>
+                    {/* {m.content} */}
                   </div>
                 )}
               </div>
@@ -108,22 +88,7 @@ export default function Chat() {
       <div className='mt-20'>    
         <form onSubmit={handleSubmit} className='fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-xl'>
           <div className='flex gap-4 items-center justify-center max-sm:px-5'>
-            <textarea
-              className="flex-1 dark:bg-black bg-slate-100 dark:text-white text-slate-800 pt-3 pb-6 px-5 mb-8 rounded-[15px] shadow-xl mx-auto focus:outline-none focus:ring-0 placeholder:text-slate-800 dark:placeholder:text-white dark:caret-white caret-black resize-none scrollbar-hide"
-              value={input}
-              placeholder="Ketik apapun"
-              onChange={(e) => {
-                handleInputChange(e)
-                const lines = e.target.value.split(/\r\n|\r|\n/).length
-                e.target.style.height = `${Math.min(100 + (lines - 1) * 24, 100 + 4 * 24)}px`
-              }}
-              onKeyDown={(e) => handleKeyPress(e)}
-              style={{
-                height: `${Math.min(100 + (input.split(/\r\n|\r|\n/).length - 1) * 24, 100 + 4 * 24)}px`,
-                lineHeight: '24px',
-              }}
-            >
-            </textarea>
+            <UserMessageBox setEditContent={setEditContent} input={input} handleInputChange={handleInputChange} handleSubmit={handleSubmit}/>
             <button onSubmit={handleSubmit} className='bg-black text-white p-1 rounded-full hover:bg-zinc-800 hover:text-slate-100 focus:outline-none'><CaretDoubleUp size={28} /></button>
           </div>
         </form>

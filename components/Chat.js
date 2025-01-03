@@ -4,7 +4,6 @@ import { useChat } from 'ai/react';
 import RenderMessage from './RenderMessage';
 import { CaretDoubleUp, CheckCircle, ClipboardText, PencilLine, Sparkle } from '@phosphor-icons/react';
 import { useState } from 'react';
-import CopyToClipboard from 'react-copy-to-clipboard';
 
 export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit } = useChat();
@@ -36,17 +35,32 @@ export default function Chat() {
       e.preventDefault();
       handleSubmit();
     }
-  };
+  }
 
   const onEditResponseMode = (messageId, content) => {
     setEditModeOn((prevState) => !prevState)
     setEditResponseMode(messageId)
     setEditContent(content)
   }
-  const copyToClipboard = async (messageId) => {
-    setCopyResponseById(messageId)
-    setIsResponseCopied(true)
+  // const copyToClipboard = async (messageId, text) => {
+  //   setCopyResponseById(messageId)
+  //   setIsResponseCopied(true)
+  // }
+  const copyToClipboard = async (messageId, text) => {
+    const formattedText = formatMarkdownForCopy(text);
+    navigator.clipboard.writeText(formattedText).then(() => {
+      setCopyResponseById(messageId);
+      setIsResponseCopied(true);
+      setTimeout(() => setIsResponseCopied(false), 1000);
+    });
+  };
+  const formatMarkdownForCopy = (text) => {
+    return text
+      .replace(/\|\\|/g, "")
+      .replace(/\|/g, "\t") 
+      .replace(/\n\s*\n/g, "\n")
   }
+  
   return (
     <div className="flex flex-col w-full max-w-3xl py-16 mx-auto stretch">
       {messages.map(m => {
@@ -65,7 +79,7 @@ export default function Chat() {
                     className={`px-5 rounded-[20px] focus:outline-none  min-h-[130px] min-w-[600px] bg-sky-100 scrollbar-hide ${isEditModeOn ? 'shadow-component py-3' : ''}`}
                   />
                 ) : (
-                  <div className="font-medium whitespace-pre-line">
+                  <div className="font-medium whitespace-pre-wrap">
                     <RenderMessage content={m.content}/>
                   </div>
                 )}
@@ -73,9 +87,11 @@ export default function Chat() {
               {m.role === 'assistant' && (
                 <div className='flex'>
                   <button className='mx-1 w-10' onClick={() => onEditResponseMode(m.id, m.content)}><PencilLine className='rounded-full p-2 hover:bg-gray-200' size={34} /></button>
-                  <CopyToClipboard text={m.content}>
-                    <button className='mx-1 w-10' onClick={() => copyToClipboard(m.id)}>{isResponseCopied && copyResponseByID === m.id ? <CheckCircle className='rounded-full p-2 hover:bg-gray-200' size={34} /> : <ClipboardText className='rounded-full p-2 hover:bg-gray-200' size={34} />}</button>
-                  </CopyToClipboard>
+                  <button className='mx-1 w-10' onClick={() => copyToClipboard(m.id, m.content)}>{isResponseCopied && copyResponseByID === m.id ? 
+                    <CheckCircle className='rounded-full p-2 hover:bg-gray-200' size={34} /> 
+                    : 
+                    <ClipboardText className='rounded-full p-2 hover:bg-gray-200' size={34} />}
+                  </button>
                 </div>
               )}
               {isEditModeOn && editResponseMode === m.id && (

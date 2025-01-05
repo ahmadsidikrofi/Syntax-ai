@@ -1,6 +1,6 @@
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { convertToCoreMessages, streamText, Message} from 'ai';
-import { initialPrompt } from '../../../libs/initialPrompt';
+import { initialPrompt } from '@/lib/initialPrompt';
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GOOGLE_API_KEY

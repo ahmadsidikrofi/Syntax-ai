@@ -32,8 +32,8 @@ export default function RenderMessage({ content }) {
           ),
           table({ children }) {
             return (
-              <div className="overflow-x-auto my-2">
-                <table className="w-full border-collapse border border-gray-300 rounded-lg">
+              <div className="overflow-x-auto my-2 rounded-[30px]">
+                <table className="w-full rounded-[30px]">
                   {children}
                 </table>
               </div>
@@ -41,7 +41,7 @@ export default function RenderMessage({ content }) {
           },
           th({ children }) {
             return (
-              <th className="border border-gray-400 bg-gray-200 px-4 py-2 text-left font-bold">
+              <th className=" bg-gray-200 px-4 py-2 text-left font-bold">
                 {children}
               </th>
             )
